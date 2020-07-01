@@ -2,11 +2,12 @@ package com.lyp.test;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lyp.mapper.UserMapper;
 import com.lyp.pojo.User;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -148,5 +149,69 @@ public class TestUserMapper {
     public void testSelectByBatchId() {
         List<User> userList = userMapper.selectBatchIds(Arrays.asList(123456L, 1087982257332887553L));
         userList.forEach(System.out::println);
+    }
+
+    /**
+     * 根据条件查询一个
+     */
+    @Test
+    public void testSelectOne() {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.eq("name", "刘红雨");
+        User user = userMapper.selectOne(wrapper);
+        System.out.println(user);
+    }
+
+    /**
+     * 根据条件查询数据的条数
+     */
+    @Test
+    public void testSelectCount() {
+        QueryWrapper wrapper = new QueryWrapper();
+        //查询用户年龄大于30岁的
+        wrapper.gt("age", 30);
+        Integer userCount = userMapper.selectCount(wrapper);
+        System.out.println("====> UserCount ===> " + userCount);
+    }
+
+    /**
+     * 查询列表 可以根据条件进行查询
+     */
+    @Test
+    public void testSelectList() {
+        QueryWrapper<User> wrapper = new QueryWrapper<>();
+        wrapper.like("name", "张");
+        List<User> userList = userMapper.selectList(wrapper);
+        userList.forEach(System.out::println);
+    }
+
+    /**
+     * 使用分页查询
+     */
+    @Test
+    public void testSelectPage() {
+        QueryWrapper wrapper = new QueryWrapper();
+        wrapper.like("name", "张");
+        Page<User> page = new Page<>(1, 2);
+        IPage iPage = userMapper.selectPage(page, wrapper);
+        long current = iPage.getCurrent();
+        System.out.println("当前页 ====> " + current);
+        long size = iPage.getSize();
+        System.out.println("每页显示条数 === > " + size);
+        long pages = iPage.getPages();
+        System.out.println("总共 " + pages + "页");
+        List userList = iPage.getRecords();
+        userList.forEach(System.out::println);
+        long total = iPage.getTotal();
+        System.out.println("数据总数 == > " + total);
+    }
+
+    /**
+     * 测试自定义的findById
+     */
+    @Test
+    public void testFindById() {
+        User user = userMapper.findById(123456L);
+        System.out.println(user);
     }
 }
